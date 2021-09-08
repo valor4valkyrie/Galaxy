@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
 
-import javax.websocket.server.PathParam;
 import java.io.IOException;
 
 @RestController
@@ -24,17 +22,19 @@ public class GalaxyNumeralsController {
         this.inputTranslateService = inputTranslateService;
     }
 
-    @GetMapping(value = "/galactic/numeral/{x}")
-    public String numeralToNumber(@PathParam(value = "x") String x) {
-        System.out.println(x);
-        //return galacticNumeralService.fromGalacticNumerals(numeral);
-        return "";
+    @GetMapping(value = "/galactic/number/{numeral}")
+    public int numeralToNumber(@PathVariable String numeral) {
+        return galacticNumeralService.fromGalacticNumerals(numeral);
+    }
+
+    @GetMapping(value = "/galactic/numeral/{number}")
+    public String numeralToNumber(@PathVariable int number) {
+        return galacticNumeralService.toGalacticNumerals(number);
     }
 
     @PostMapping(value = "/galactic/translate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String translate(@RequestParam("file") MultipartFile file) throws IOException {
-        inputTranslateService.translateInquiry(file);
-        return "Success";
+        return inputTranslateService.translateInquiry(file);
     }
 
 }
