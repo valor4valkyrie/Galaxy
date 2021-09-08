@@ -4,11 +4,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class GalacticNumeralService {
 
-    static final String INVALID_MESSAGE = "I don't know what you are talking about";
+    Logger logger = Logger.getLogger(this.getClass().toString());
+
+    static final String INVALID_NUMERAL_MESSAGE = "Invalid Numeral";
+    static final String INVALID_NUMBER_MESSAGE = "Invalid Number";
 
     public String toGalacticNumerals(int number) {
 
@@ -24,29 +28,41 @@ public class GalacticNumeralService {
 
         String numerals = stringBuilder.toString();
 
-        if(!isNumeralsValid(numerals)) return "I don't know what you are talking about";
+        if (!isNumeralsValid(numerals)) {
+            logger.severe(INVALID_NUMBER_MESSAGE);
+            return INVALID_NUMBER_MESSAGE;
+        }
 
         return stringBuilder.toString();
     }
 
-    public String fromGalacticNumerals(String numerals) {
+    public int fromGalacticNumerals(String numerals) {
 
         List<Integer> numbers = new ArrayList();
 
-        if (isNumeralsValid(numerals) == false) return INVALID_MESSAGE;
+        if (isNumeralsValid(numerals)) {
+            numerals.chars().mapToObj(c -> (char) c).forEach(character -> {
+                numbers.add(Numerals.valueOf(character.toString()).getValue());
+            });
+        } else {
+            logger.severe(INVALID_NUMERAL_MESSAGE);
+        }
 
-        numerals.chars().mapToObj(c -> (char) c).forEach(character -> {
-            numbers.add(Numerals.valueOf(character.toString()).getValue());
-        });
-
-        return calculateToNumber(numbers).stream().reduce(0, Integer::sum).toString();
+        return calculateToNumber(numbers).stream().reduce(0, Integer::sum);
     }
 
-    private boolean isNumeralsValid(String numeral) {
+    public boolean isNumeralsValid(String numeral) {
 
-        if (numeral.contains("DD") || numeral.contains("LL") || numeral.contains("VV") || numeral.contains("XXXX") ||
-                numeral.contains("IIII") || numeral.contains("CCCC") || numeral.contains("MMMM") ||
-                numeral.contains("IL") || numeral.contains("IC") || numeral.contains("ID") || numeral.contains("IM")
+        StringBuilder sb = new StringBuilder();
+
+        numeral.chars().mapToObj(ch -> (char) ch)
+                .filter(ch -> Character.isUpperCase(ch))
+                .forEach(upCh -> sb.append(upCh));
+
+        if (!sb.toString().equals(numeral) || numeral.contains("DD") || numeral.contains("LL") || numeral.contains("VV") ||
+                numeral.contains("XXXX") || numeral.contains("IIII") || numeral.contains("CCCC") ||
+                numeral.contains("MMMM") || numeral.contains("IL") || numeral.contains("IC") ||
+                numeral.contains("ID") || numeral.contains("IM")
         ) {
             return false;
         }
@@ -84,8 +100,8 @@ public class GalacticNumeralService {
     private String calculateThousandsToNumeral(int thousands) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for(int x = 0; x < thousands; x++) {
-            if(stringBuilder.length() >= 3 &&
+        for (int x = 0; x < thousands; x++) {
+            if (stringBuilder.length() >= 3 &&
                     stringBuilder.substring(stringBuilder.length() - 3, stringBuilder.length()).contains("MMM")) {
                 stringBuilder.append("DMDM");
             } else {
@@ -99,18 +115,18 @@ public class GalacticNumeralService {
     private String calculateHundredsToNumeral(int hundreds) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        if(hundreds == 4) {
+        if (hundreds == 4) {
             stringBuilder.append("CD");
             hundreds = hundreds - 4;
-        } else if(hundreds >= 5 && hundreds < 9) {
+        } else if (hundreds >= 5 && hundreds < 9) {
             stringBuilder.append("D");
             hundreds = hundreds - 5;
-        } else if(hundreds == 9){
+        } else if (hundreds == 9) {
             stringBuilder.append("CM");
             hundreds = hundreds - 9;
         }
 
-        for(int x = 0; x < hundreds; x++) {
+        for (int x = 0; x < hundreds; x++) {
             stringBuilder.append("C");
         }
 
@@ -121,18 +137,18 @@ public class GalacticNumeralService {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if(tens == 4) {
+        if (tens == 4) {
             stringBuilder.append("XL");
             tens = tens - 4;
-        } else if(tens >= 5 && tens < 9) {
+        } else if (tens >= 5 && tens < 9) {
             stringBuilder.append("L");
             tens = tens - 5;
-        } else if(tens == 9){
+        } else if (tens == 9) {
             stringBuilder.append("XC");
             tens = tens - 9;
         }
 
-        for(int x = 0; x < tens; x++) {
+        for (int x = 0; x < tens; x++) {
             stringBuilder.append("X");
         }
 
@@ -143,18 +159,18 @@ public class GalacticNumeralService {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if(ones == 4) {
+        if (ones == 4) {
             stringBuilder.append("IV");
             ones = ones - 4;
-        } else if(ones >= 5 && ones < 9) {
+        } else if (ones >= 5 && ones < 9) {
             stringBuilder.append("V");
             ones = ones - 5;
-        } else if(ones == 9){
+        } else if (ones == 9) {
             stringBuilder.append("IX");
             ones = ones - 9;
         }
 
-        for(int x = 0; x < ones; x++) {
+        for (int x = 0; x < ones; x++) {
             stringBuilder.append("I");
         }
 
