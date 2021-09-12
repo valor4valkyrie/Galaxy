@@ -2,8 +2,7 @@ package com.example.galaxy.services;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Service
@@ -59,15 +58,10 @@ public class GalacticNumeralService {
                 .filter(ch -> Character.isUpperCase(ch))
                 .forEach(upCh -> sb.append(upCh));
 
-        if (!sb.toString().equals(numeral) || numeral.contains("DD") || numeral.contains("LL") || numeral.contains("VV") ||
-                numeral.contains("XXXX") || numeral.contains("IIII") || numeral.contains("CCCC") ||
-                numeral.contains("MMMM") || numeral.contains("IL") || numeral.contains("IC") ||
-                numeral.contains("ID") || numeral.contains("IM")
-        ) {
-            return false;
-        }
+        String[] illegalCharacters = {"DD", "LL", "VV", "XXXX", "IIII", "CCCC", "MMMM", "IL", "IC", "ID", "IM"};
 
-        return true;
+        return Arrays.stream(illegalCharacters)
+                .filter(e -> !sb.toString().equals(numeral) || sb.toString().contains(e)).count() == 0L;
     }
 
     private List<Integer> calculateToNumber(List integers) {
